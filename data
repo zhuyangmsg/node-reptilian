@@ -1,0 +1,380 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="referrer" content="origin" />
+<title>nodeJS-使用buffer类处理二进制数据 - 龙恩0707 - 博客园</title>
+<meta property="og:description" content="nodeJS-使用buffer类处理二进制数据" />
+<link type="text/css" rel="stylesheet" href="/bundles/blog-common.css?v=giTNza-Of-PEt5UsELhFQAR7G6-bfaSa4oolcq7i9-o1"/>
+<link id="MainCss" type="text/css" rel="stylesheet" href="/skins/Minyx2_Lite/bundle-Minyx2_Lite.css?v=31LnKVZKExANeeULRFZQ4mpM8UMZKP4h98BX7Bpksj81"/>
+<link type="text/css" rel="stylesheet" href="/blog/customcss/161525.css?v=PZkhSsF9Ly9VtOqxRYgHEC%2bRDQ0%3d"/>
+<link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/Minyx2_Lite/bundle-Minyx2_Lite-mobile.css?v=d9LctKHRIQp9rreugMcQ1-UJuq_j1fo0GZXTXj8Bqrk1"/>
+<link title="RSS" type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/tugenhua0707/rss"/>
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/tugenhua0707/rsd.xml"/>
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/tugenhua0707/wlwmanifest.xml"/>
+<script src="//common.cnblogs.com/scripts/jquery-2.2.0.min.js"></script>
+<script type="text/javascript">var currentBlogApp = 'tugenhua0707', cb_enable_mathjax=true;var isLogined=false;</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], processClass: 'blogpost-body', processEscapes: true },
+        TeX: { 
+            equationNumbers: { autoNumber: ['AMS'], useLabelIds: true }, extensions: ['extpfeil.js'] },
+            'HTML-CSS': { linebreaks: { automatic: true } },
+            SVG: { linebreaks: { automatic: true } }
+        });
+    </script><script src="//mathjax.cnblogs.com/2_7_2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="/bundles/blog-common.js?v=yRkjgN2sBQkB4hX-wirHxPomeBT9sB5dawr6ob7KIvg1" type="text/javascript"></script>
+<script src="/skins/Minyx2_Lite/bundle-Minyx2_Lite.js?v=MwPIINgK4v7xLBnbl6OnO58zfHmX6gCGNC_bNw-5jrg1" language="javascript" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+
+
+<div id="container">
+    <a class="minyx" href="http://www.cnblogs.com/">代码改变世界</a>
+    <ul id="topMnu">
+        <!-- 统计数据 -->
+        <li>
+            
+                <div id="blog_stats">
+Posts - 283, 
+Articles - 2, 
+Comments - 989
+<!----></div>
+            
+        </li>
+        <!-- 这边可以增加一些链接 -->
+        <!-- 博客园 -->
+        <li><a href="http://www.cnblogs.com">Cnblogs</a></li>
+        <!-- 管理 -->
+        <li id="topMnu-dashboard">
+            <a id="lnkDashboard" href="https://www.cnblogs.com/tugenhua0707/admin/EditPosts.aspx">Dashboard</a></li>
+        <li>
+            <a id="lnkLogin" href="http://passport.cnblogs.com/login.aspx?ReturnUrl=http://www.cnblogs.com/tugenhua0707/p/4456300.html">Login</a></li>
+    </ul>
+
+    <script type="text/javascript">
+        var m = window.__blog.topMenuRendered;
+        if (m) { m(__$("topMnu")); }
+    </script>
+
+    <div id="header">
+        <ul id="menu">
+            <!-- 首页，当前section加上current类 -->
+            <li id="menu-home" class="current">
+                <a id="lnkHome" href="https://www.cnblogs.com/tugenhua0707/">Home</a></li>
+            <!-- 联系 -->
+            <li id="menu-contact">
+                <a id="lnkContact" href="http://space.cnblogs.com/msg/send/%e9%be%99%e6%81%a90707">Contact</a></li>
+            <!-- 相册 -->
+            <li id="menu-gallary">
+                <a id="lnkGallery" href="https://www.cnblogs.com/tugenhua0707/gallery.html">Gallery</a></li>
+            <!-- Rss订阅 -->
+            <li id="rss">
+                <a id="lnkRss" href="https://www.cnblogs.com/tugenhua0707/rss">RSS</a></li>
+        </ul>
+        <div id="newmsg"></div>
+        <h1>
+            <!-- 主标题 -->
+            <a id="lnkBlogTitle" href="https://www.cnblogs.com/tugenhua0707/">龙恩0707</a>
+            <!-- 子标题 -->
+            <small>
+                ..........</small>
+        </h1>
+    </div>
+
+    <script type="text/javascript">
+        var m = window.__blog.headerRendered;
+        if (m) { m(__$("header")); }
+    </script>
+
+    <div id="wrapper">
+        <div id="content">
+            <script type="text/javascript">
+                var m = window.__blog.preRenderPosts;
+                if (m) { m(); }
+            </script>
+            
+<div id="post_detail">
+<div class="post" id="post">
+    <a name="top"></a>
+    <h2><a id="cb_post_title_url" href="https://www.cnblogs.com/tugenhua0707/p/4456300.html">nodeJS-使用buffer类处理二进制数据</a></h2>
+    <small>2015-04-25 17:43 by 龙恩0707, <span id="post_view_count">...</span> 阅读, <span id="post_comment_count">...</span> 评论, <a href="#" onclick="AddToWz(4456300);return false;">收藏</a>,  <a href ="https://i.cnblogs.com/EditPosts.aspx?postid=4456300" rel="nofollow">编辑</a></small>
+    <div class="entry">
+        <div id="cnblogs_post_body" class="blogpost-body"><p style="background: #999; color: #fff; font-size: 24px; height: 40px; line-height: 40px; padding-left: 12px; font-weight: bold;">使用buffer类处理二进制数据</p>
+<p>&nbsp; &nbsp; &nbsp; <span style="font-size: 16px; font-family: 'Microsoft YaHei';">在客户端javascript脚本代码中，对于二进制数据并没有提供一个很好的支持。然后在nodejs中需要处理像TCP流或文件流时，必须要处理二进制数据。因此在node.js中，定义了一个Buffer类，该类用来创建一个专门存放二进制数据的缓存区。</span><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;&nbsp;</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>一：创建</strong><strong>Buffer</strong><strong>对象</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp;在node.js中，Buffer类是一个可以在任何模块被利用的全局类，不需要为该类的使用而加载任何模块。可以使用new关键字来创建该类的实例对象。Buffer类可以使用三种方式来构造函数，第一种方式如下：</span></p>
+<p><strong><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; new Buffer(size)</span></strong></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">被创建的buffer对象拥有一个length属性，属性值为缓存区的大小。如下：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><img src="https://images0.cnblogs.com/blog2015/561794/201504/251730457659475.png" alt="" /></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">我们现在也可以使用Buffer对象的fill方法来初始化缓存区中的所有内容，如下所示：</span></p>
+<p><strong><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; buf.fill(value,[offset],[end]);</span></strong></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在Buffer对象的fill方法中，可以使用三个参数，第一个参数为必须指定的参数，参数值为需要被写入的数值，第二个参数与第三个参数为可选参数，其中第二个参数用于指定从第几个字节处开始写入被指定的数值，默认值为0，即从缓存区的起始位置写入，第三个参数用于指定将数值一直写入到第几个字节处，默认值为Buffer对象的大小，即书写到缓存区的底部。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">现在我们希望从buffer对象的缓存区的第10字节处开始写入1，一直到缓存区底部，如下所示：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><img src="https://images0.cnblogs.com/blog2015/561794/201504/251731312816870.png" alt="" /></span></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;">我们现在也可以在缓存区的第20到第30字节处(从第20字节开始，不包含第30字节)填入2，演示如下：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251731519378826.png" alt="" /></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;">Buffer类的第二种形式的构造函数是直接使用一个数组来初始化缓存区，代码如下所示：</span></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;"><strong>&nbsp; &nbsp; new Buffer(array)</strong></span></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;">演示如下：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251732184535493.png" alt="" /></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;">Buffer类的第三种形式的构造函数是直接使用一个字符串来初始化缓存区，代码如下：</span></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;"><strong>&nbsp; &nbsp;new Buffer(str,[encoding]);</strong></span></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;">第一个参数为必须指定的参数，参数值为用于初始化换出区的字符串，第二个参数值为一个用于指定文字编码格式的字符串，默认值为utf-8</span></p>
+<p><span style="font-family: 'Microsoft YaHei'; font-size: 16px;">如下所示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251732452187616.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在Node.js中，将自动执行字符串的输入输出时的编码与解码处理，默认使用utf-8编码，可以使用编码格式如下表所示：</span></p>
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;编码</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;说明</span></td>
+</tr>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;ascii</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;ASCLL字符串</span></td>
+</tr>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;utf8</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;UTF-8字符串</span></td>
+</tr>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;utf16le</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;UTF-16LE字符串</span></td>
+</tr>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;ucs2</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;UCS2字符串</span></td>
+</tr>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;base64</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;经过BASE64编码后的字符串</span></td>
+</tr>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;binary</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;二进制数据(不推荐使用)</span></td>
+</tr>
+<tr>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;hex</span></td>
+<td><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;使用16进制数值表示的字符串</span></td>
+</tr>
+</tbody>
+</table>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">当使用字符串参数来创建buffer对象并初始化缓存区时，如果使用不同的编码格式，则缓存区中的数据也会有所不同，如下演示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251735542349603.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>二：字符串的长度与缓存区的长度</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp; 在node.js中，一个字符串的长度与根据该字符串所创建的缓存区的长度并不相同，因为在计算字符串的长度时，是以文字作为一个单位，而在计算缓存区的长度时，是以字节作为一个单位。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">比如针对 &rdquo;我喜爱编程&rdquo;这个字符串，该字符串对象的length属性值与根据该字符串创建的buffer对象的length属性值并不相同。因为字符串对象的length属性值获取的是文字个数，而buffer对象的length属性值获取的是缓存区的长度，即缓存区中的字节。</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251737141251331.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">另外，可以使用0开始的序号来取出字符串对象或缓存区中的数据。但是，在获取数据时，字符串对象是以文字作为一个单位，而缓存区对象是以字节作为一个单位。比如，针对一个引用了字符串对象的str变量来说，str[2]获取的是第三个文字，而针对一个引用了缓存区对象的buf对象来说，buf[2]获取的是缓存区中的第三个字节数据转换为整数后的数值。如下：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251738428753550.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">而buffer对象是可以被修改的。可以通过序号来修改其中某个字节处的数据。如下：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251739048756762.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">Buffer对象还有一个用于取出指定位置处数据的slice方法，该方法的使用方法与string对象的slice方法相同。</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251739259845646.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>注意：</strong>由于buffer对象的slice方法并不是复制缓存区中的数据，而是与该数据共享内存区域，因此，如果修改使用slice方法取出的数据，则缓存区中保存的数据也将被修改。如下演示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251739492651900.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>三：</strong><strong>Buffer</strong><strong>对象与字符串对象之间的相互转换；</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>&nbsp; &nbsp; 1.&nbsp;&nbsp; </strong><strong>Buffer</strong><strong>对象的</strong><strong>toString</strong><strong>方法</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp;可以使用Buffer对象的toString方法将Buffer对象中保存的数据转换为字符串，使用方法如下所示：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>&nbsp; &nbsp; &nbsp;buf.toString([encoding],[start],[end]);</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在Buffer对象的toString方法中，可以使用三个可选参数，第一个参数用于指定Buffer对象中保存的文字编码格式，默认参数值为utf8，第二个及第三个用于指定被转换数据的起始位置和终止位置，以字节为单位。toString方法返回经过转换后的字符串。</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251740258439059.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>四：</strong><strong>Buffer</strong><strong>对象的</strong><strong>write</strong><strong>方法</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp;如果要将字符串当做二进制数据来使用，只需将该字符串作为Buffer类的构造函数的参数来创建Buffer对象即可。但是有时候我们需要向已经创建好的Buffer对象中写入字符串，这时候我们可以使用Buffer对象的write方法，代码如下所示：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; <strong>buf.write(string,[offset],[length],[encoding]);</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在buffer对象的write方法中，可以使用四个参数，第一个参数为必须指定的参数，后三个参数为可选参数，第一个参数用于指定需要写入的字符串，第二个参数offset与第三个参数length用于指定字符串转换为字节数据的写入位置。字节数据的书写位置为从第1+offset个字节开始到offset+length个字节为止(列如offset为3，length为8，写入位置为从第4个字节开始到第11个字节为止，包括第4个字节与第11个字节)。第四个参数用于指定写入字符串时使用的编码格式，默认是utf8格式。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">如下代码演示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251741479062455.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>五：</strong><strong>Buffer</strong><strong>对象与</strong><strong>JSON</strong><strong>对象之间的相互转换</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp; 在Node.js中，可以使用<strong>JSON.stringfy</strong>方法将Buffer对象中保存的数据转换为一个字符串，也可以使用<strong>JSON.parse</strong>方法将一个经过转换后的字符串还原为一个数组。</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251742123591251.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>六：复制缓存数据。</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; 当需要将Buffer对象中保存的二进制数据复制到另一个Buffer对象中时，可以使用Buffer对象的copy方法，copy方法的使用方法如下所示：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp;<strong>buf.copy(targetBuffer,[targetStart],[sourceStart],[sourceEnd]);</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在Buffer对象的copy方法中，使用四个参数，第一个参数为必须指定的参数，其余三个参数均为可选参数。第一个参数用于指定复制的目标Buffer对象。第二个参数用于指定目标Buffer对象中从第几个字节开始写入数据，参数值为一个小于目标的Buffer对象长度的整数值，默认值为0(从开始处写入数据)。第三个参数用于指定从复制源Buffer对象中获取数据时的开始位置，默认值为0，即从复制源Buffer对象中的第一个字节开始获取数据，第四个参数用于指定从复制源Buffer对象中获取数据时的结束位置，默认值为复制源Buffer对象的长度，即一直获取完毕复制源Buffer对象中的所有剩余数据。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">比如如下：将a中buffer对象中的内容复制到b中的buffer对象中，复制的目标起始位置为b的buffer对象中的第11字节处(第11字节处开始写入)。如下所示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251742539063092.png" alt="" /></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>七：</strong><strong>Buffer</strong><strong>类的类方法</strong></span></p>
+<ol>
+<li><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>isBuffer方法</strong></span></li>
+</ol>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp; isBuffer方法用于判断一个对象是否为一个Buffer对象，使用方法如下：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp; <strong>Buffer.isBuffer(obj)</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在isBuffer方法中，使用一个参数，用于指定需要被判断的对象，如果对象为Buffer对象，方法返回true，否则返回false。演示如下：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251743338285462.png" alt="" /></p>
+<p>&nbsp; &nbsp;<span style="font-size: 16px; font-family: 'Microsoft YaHei';"> <strong>2. byteLength方法；</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp;可以使用byteLength方法计算一个指定字符串的字节数，使用方法如下所示：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>&nbsp; &nbsp; &nbsp;Buffer.byteLength(string,[encoding]);</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在byteLength方法中，使用两个参数，第一个参数为必须输入的参数，用于指定需要计算字节数的字符串，第二个参数为可选参数，用于指定按什么编码方式来计算字节数。默认值为utf8.</span><br /><span style="font-size: 16px; font-family: 'Microsoft YaHei';">
+如下演示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251744063907379.png" alt="" /></p>
+<p>&nbsp; &nbsp;<span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>3. concat方法。</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; &nbsp;concat方法用于将几个Buffer对象结合创建为一个新的Buffer对象，使用方法如下所示：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp; &nbsp; <strong>Buffer.concat(list,[totalLength])</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在concat方法中，使用两个参数，第一个参数为必须指定的参数，参数值为一个存放了多个buffer对象的数组，concat方法将把其中的所有Buffer对象链接创建为一个Buffer对象；第二个参数为可选参数，用于指定被创建的Buffer对象的长度，当省略该参数时，被创建的Buffer对象为第一个参数数组中所有Buffer对象的长度的合计值。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">如果一个参数值为一个空数组或第二个参数值等于0，那么concat方法返回一个长度为0的Buffer对象。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">如果第一个参数值数组中只有一个Buffer对象，那么concat方法直接返回该Buffer对象。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">如果第一个参数值数组中拥有一个以上的Buffer对象，那么concat方法返回被创建的Buffer对象。</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">如下演示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251744498432606.png" alt="" /></p>
+<p>&nbsp; <span style="font-size: 16px; font-family: 'Microsoft YaHei';">&nbsp;<strong>4. isEncoding方法。</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">isEncoding方法用于检测一个字符串是否为一个有效的编码格式字符串，使用方法如下所示：</span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';"><strong>Buffer.isEncoding(encoding);</strong></span></p>
+<p><span style="font-size: 16px; font-family: 'Microsoft YaHei';">在isEncoding方法中，使用一个参数，用于指定需要被检测的字符串。如果该字符串为有效的编码格式字符串，则方法返回true，如果该字符串不是一个有效的编码格式字符串，则方法返回false。如下演示：</span></p>
+<p><img src="https://images0.cnblogs.com/blog2015/561794/201504/251745287962906.png" alt="" /></p></div><div id="MySignature"></div>
+        <div class="clear"></div>
+        <div id="blog_post_info_block">
+        <div id="blog_post_info">
+        </div>
+        <div class="clear"></div>
+        <div id="post_next_prev"></div>
+    </div>
+</div>
+    <ul class="postmetadata">
+        <li class="icon_cat" id="BlogPostCategory"></li>
+        <li class="icon_bullet" id="EntryTag"></li>
+    </ul>
+</div>
+<script type="text/javascript">var allowComments=true,cb_blogId=161525,cb_entryId=4456300,cb_blogApp=currentBlogApp,cb_blogUserGuid='0bb325ba-be0e-e311-8d02-90b11c0b17d6',cb_entryCreatedDate='2015/4/25 17:43:00';loadViewCount(cb_entryId);var cb_postType=1;</script>
+<script type="text/javascript">
+    var m = window.__blog.postRendered;
+    if (m) { m(__$("post")); }
+</script>
+<script type="text/javascript">
+    var m = window.__blog.postRenderPosts;
+    if (m) { m(); }
+</script>
+</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id='comment_form' class='commentform'>
+<a name='commentform'></a>
+<div id='divCommentShow'></div>
+<div id='comment_nav'><span id='span_refresh_tips'></span><a href='javascript:void(0);' onclick='return RefreshCommentList();' id='lnk_RefreshComments' runat='server' clientidmode='Static'>刷新评论</a><a href='#' onclick='return RefreshPage();'>刷新页面</a><a href='#top'>返回顶部</a></div>
+<div id='comment_form_container'></div>
+<div class='ad_text_commentbox' id='ad_text_under_commentbox'></div>
+<div id='ad_t2'></div>
+<div id='opt_under_post'></div>
+<div id='cnblogs_c1' class='c_ad_block'></div>
+<div id='under_post_news'></div>
+<div id='cnblogs_c2' class='c_ad_block'></div>
+<div id='under_post_kb'></div>
+<div id='HistoryToday' class='c_ad_block'></div>
+<script type='text/javascript'>
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+        </div>
+
+        <script type="text/javascript">
+            var m = window.__blog.contentRendered;
+            if (m) { m(__$("content")); }
+        </script>
+
+        <div id="sidebar">
+            
+<div id="about">
+<div>
+<h2 id="about_title">About</h2>
+<div id="about_body">
+<div id="blog-news"></div>
+<script type="text/javascript">loadBlogNews();</script>
+</div>
+</div>
+</div>
+
+            <script type="text/javascript">
+                var m = window.__blog.aboutRendered;
+                if (m) { m(__$("about")); }
+            </script>
+            
+<div id="mySearchWrapper">
+    <div id="mySearch">
+        <input type="image" src="/skins/Minyx2_Lite/images/btnsearch.gif" id="btnZzk"  class="submit" onclick="zzk_go();return false;"/>
+        <label class="lb_search"><input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="keyword" /></label>
+    </div>
+</div>
+
+            <script type="text/javascript">
+                var m = window.__blog.searchFormRendered;
+                if (m) { m(__$("searchform")); }
+            </script>
+            <div id="sideMain">
+            </div>
+            <div id="sideRight">
+            </div>
+            <div id="sideLeft">
+            </div>
+            
+                <div id="sideContainer">
+                </div>
+                <script type="text/javascript">
+                    $.ajax({
+                        url: '/' + currentBlogApp + '/mvc/blog/Minyx2_Lite_SideColumn.aspx',
+                        data: '{}',
+                        type: 'post',
+                        dataType: 'text',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+                            if (data) {
+                                $("#sideContainer").html(data);
+                                loadBlogDefaultCalendar();
+                                loadBlogSideBlocks();
+                                var m = window.__blog.sideContainerRendered;
+                                if (m) { m(__$("sideContainer")); }
+                                window.__blog.sidebar.__layout();
+                            }
+                        }
+                    });
+
+                </script>
+            
+        </div>
+
+        <script type="text/javascript">
+            var m = window.__blog.sidebarRendered;
+            if (m) { m(__$("sidebar")); }
+        </script>
+
+        <div id="footer">
+            
+<p id="logoFoot">
+    <a href="http://www.spiga.com.mx/" title="Agencia Interactiva Spiga">www.spiga.com.mx</a>
+</p>
+<div class="footText">
+<p>
+Copyright &copy;2018 龙恩0707
+</p>
+<p>
+<a href="http://www.cnblogs.com">博客园</a>
+</p>
+</div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var m = window.__blog.wrapperRendered;
+        if (m) { m(__$("wrapper")); }
+    </script>
+
+</div>
+<script type="text/javascript">
+    var m = window.__blog.containerRendered;
+    if (m) { m(__$("container")); }
+</script>
+</body>
+</html>
